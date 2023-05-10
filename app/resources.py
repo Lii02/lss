@@ -52,11 +52,11 @@ class UploadFile(Resource):
 class DownloadFile(Resource):
     def get(self):
         data = request.get_json()
-        decoded = base64.b64encode(data["blob"].encode("utf-8"))
-        blob = manager.buckets[data["bucket_name"]].download(decoded)
+        blob = manager.buckets[data["bucket_name"]].download(data["filename"])
+        encoded_blob = base64.b64decode(blob)
         if blob is not None:
             return {
-                "data": f"{blob}",
+                "data": f"{encoded_blob}",
                 "is_encoded": "1"
             }
         else:
