@@ -43,7 +43,8 @@ class BucketManager:
         print(f"Loaded buckets from last update {self.last_update}...")
 
     def save_state(self):
-        self.last_update = time.time()
+        # For whatever reason time.time() is a float
+        self.last_update = int(time.time())
         data = {
             "last_update": self.last_update,
             "buckets": []
