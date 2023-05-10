@@ -3,11 +3,23 @@ from flask_restful import *
 from bucket_manager import *
 
 manager = BucketManager("./")
+manager.load_state()
+
+class Index(Resource):
+    def get(self):
+        content = "<h1>Bucket Manager<h1>"
+        for b in manager.buckets:
+            content += f"<p>{b.bucket_name}</p>"
+        return Response(content, mimetype="text/html")
+
+class Refresh(Resource):
+    def post(self):
+        manager.load_state()
+        return "Success", 200
 
 class CreateBucket(Resource):
     def post(self):
         data = request.get_json()
-        manager.load_state()
         bucket = Bucket(data["bucket_name"])
         code = manager.add_bucket(bucket)
         if code is True:
@@ -19,7 +31,6 @@ class CreateBucket(Resource):
 class RemoveBucket(Resource):
     def post(self):
         data = request.get_json()
-        manager.load_state()
         code = manager.remove_bucket(data["bucket_name"])
         if code is True:
             manager.save_state()

@@ -1,9 +1,13 @@
 from bucket import *
 import os
 import json
+import time
+
+BUCKETS_FILE = "buckets.json"
 
 class BucketManager:
     buckets = {}
+    last_update = 0
 
     def __init__(self, root_path: str):
         self.root_path = root_path
@@ -27,7 +31,24 @@ class BucketManager:
             return False
 
     def load_state(self):
-        pass
+        self.buckets.clear()
+        # If the buckets.json file doesn't, return
+        if not os.path.exists(BUCKETS_FILE):
+            print(f"No {BUCKETS_FILE}, skipping loading procedure..")
+            return
+        with open(BUCKETS_FILE, "r") as file:
+            data = json.load(file)
+            self.last_update = data["last_update"]
+        # TODO: Make this a proper date time rather than POSIX timestamp
+        print(f"Loaded buckets from last update {self.last_update}...")
 
     def save_state(self):
-        pass
+        self.last_update = time.time()
+        data = {
+            "last_update": self.last_update,
+            "buckets": []
+        }
+        for b in self.buckets.values():
+            data["buckets"].append(b.to_dict())
+        with open(BUCKETS_FILE, "w") as file:
+            json.dump(data, file)
