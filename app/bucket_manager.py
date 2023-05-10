@@ -17,6 +17,7 @@ class BucketManager:
             bucket.whole_path = f"{self.root_path}/{bucket.bucket_name}"
             os.mkdir(bucket.whole_path)
             self.buckets[bucket.bucket_name] = bucket
+            print(f"Create bucket {bucket.bucket_name}")
             return True
         else:
             return False
@@ -38,6 +39,12 @@ class BucketManager:
             return
         with open(BUCKETS_FILE, "r") as file:
             data = json.load(file)
+            for b in data["buckets"]:
+                bucket = Bucket(b["bucket_name"])
+                bucket.whole_path = b["whole_path"]
+                bucket.files = b["files"]
+                self.buckets[bucket.bucket_name] = bucket
+                print(f"Found bucket {bucket.bucket_name} in {BUCKETS_FILE}")
             self.last_update = data["last_update"]
         # TODO: Make this a proper date time rather than POSIX timestamp
         print(f"Loaded buckets from last update {self.last_update}...")
@@ -52,4 +59,4 @@ class BucketManager:
         for b in self.buckets.values():
             data["buckets"].append(b.to_dict())
         with open(BUCKETS_FILE, "w") as file:
-            json.dump(data, file)
+            json.dump(data, file, indent=1)

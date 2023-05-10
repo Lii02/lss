@@ -1,16 +1,10 @@
 from flask import *
 from flask_restful import *
 from bucket_manager import *
+import base64
 
 manager = BucketManager("./")
 manager.load_state()
-
-class Index(Resource):
-    def get(self):
-        content = "<h1>Bucket Manager<h1>"
-        for b in manager.buckets:
-            content += f"<p>{b.bucket_name}</p>"
-        return Response(content, mimetype="text/html")
 
 class Refresh(Resource):
     def post(self):
@@ -37,3 +31,33 @@ class RemoveBucket(Resource):
             return "Success", 200
         else:
             return "Bucket doesn't exist", 409
+
+class UploadFile(Resource):
+    def post(self):
+        data = request.get_json()
+        # TODO: Add the option to encode the data when sending to the bucket folder
+        is_encoded = bool(int(data["is_encoded"]))
+        blob = data["blob"].encode("utf-8")
+        if is_encoded:
+            input_data = base64.b64decode(blob)
+        else:
+            input_data = blob
+        code = manager.buckets[data["bucket_name"]].upload(data["filename"], input_data)
+        if code:
+            manager.save_state()
+            return "Success", 200
+        else:
+            return "File already exists in bucket", 409
+
+class DownloadFile(Resource):
+    def get(self):
+        data = request.get_json()
+        decoded = base64.b64encode(data["blob"].encode("utf-8"))
+        blob = manager.buckets[data["bucket_name"]].download(decoded)
+        if blob is not None:
+            return {
+                "data": f"{blob}",
+                "is_encoded": "1"
+            }
+        else:
+            return "File doesn't exist in bucket", 409

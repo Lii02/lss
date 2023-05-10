@@ -7,10 +7,11 @@ app = Flask(__name__)
 CORS(app)
 api = Api(app)
 
-api.add_resource(resources.Index, "/")
 api.add_resource(resources.Refresh, "/refresh")
 api.add_resource(resources.CreateBucket, "/create_bucket")
 api.add_resource(resources.RemoveBucket, "/remove_bucket")
+api.add_resource(resources.UploadFile, "/upload")
+api.add_resource(resources.DownloadFile, "/download")
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=6250, debug=True)
