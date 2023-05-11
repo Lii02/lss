@@ -1,5 +1,5 @@
 import os
-from functools import wraps
+import functools
 from flask_restful import request
 
 class AuthenticationManager:
@@ -18,11 +18,17 @@ class AuthenticationManager:
             return True
         return False
 
+    def deauth(self, ip_address: str):
+        if ip_address in self.allowed:
+            self.allowed.remove(ip_address)
+            return True
+        return False
+
     def is_authed(self, ip_address: str):
         return ip_address in self.allowed
 
     def authenticated_resource(self, func):
-        @wraps(func)
+        @functools.wraps(func)
         def wrapper(*args, **kwargs):
             if self.is_authed(request.remote_addr):
                 return func(*args, **kwargs)

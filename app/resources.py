@@ -19,6 +19,16 @@ class Authenticate(Resource):
         else:
             return f"Failed to auth {request.remote_addr}", 409
 
+class Deauthenticate(Resource):
+    def post(self):
+        # Just in case I add arguments to the request
+        data = request.get_json()
+        code = auth.deauth(request.remote_addr)
+        if code:
+            return f"Successfully deauthed {request.remote_addr}", 200
+        else:
+            return f"The address {request.remote_addr} has not been authenticated", 400
+
 class Refresh(Resource):
     @auth.authenticated_resource
     def post(self):
