@@ -20,14 +20,18 @@ class Authenticate(Resource):
             return f"Failed to auth {request.remote_addr}", 409
 
 class Deauthenticate(Resource):
+    # This doesn't need to be auth locked
     def post(self):
-        # Just in case I add arguments to the request
-        data = request.get_json()
         code = auth.deauth(request.remote_addr)
         if code:
             return f"Successfully deauthed {request.remote_addr}", 200
         else:
             return f"The address {request.remote_addr} has not been authenticated", 400
+
+class GetState(Resource):
+    @auth.authenticated_resource
+    def get(self):
+        return manager.to_dict(), 200
 
 class Refresh(Resource):
     @auth.authenticated_resource

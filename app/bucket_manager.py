@@ -53,11 +53,14 @@ class BucketManager:
     def save_state(self):
         # For whatever reason time.time() is a float
         self.last_update = int(time.time())
+        with open(BUCKETS_FILE, "w") as file:
+            json.dump(self.to_dict(), file, indent=1)
+
+    def to_dict(self):
         data = {
             "last_update": self.last_update,
             "buckets": []
         }
         for b in self.buckets.values():
             data["buckets"].append(b.to_dict())
-        with open(BUCKETS_FILE, "w") as file:
-            json.dump(data, file, indent=1)
+        return data
