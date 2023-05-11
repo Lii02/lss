@@ -2,6 +2,7 @@ from bucket import *
 import os
 import json
 import time
+import shutil
 
 BUCKETS_FILE = "buckets.json"
 
@@ -25,7 +26,7 @@ class BucketManager:
     def remove_bucket(self, bucket_name: str):
         if bucket_name in self.buckets:
             bucket = self.buckets[bucket_name]
-            os.rmdir(bucket.whole_path)
+            shutil.rmtree(bucket.whole_path)
             del self.buckets[bucket_name]
             return True
         else:
