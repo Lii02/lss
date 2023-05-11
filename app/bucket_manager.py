@@ -17,7 +17,7 @@ class BucketManager:
             bucket.whole_path = f"{self.root_path}/{bucket.bucket_name}"
             os.mkdir(bucket.whole_path)
             self.buckets[bucket.bucket_name] = bucket
-            print(f"Create bucket {bucket.bucket_name}")
+            print(f"Created bucket {bucket.bucket_name}")
             return True
         else:
             return False

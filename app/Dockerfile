@@ -1,5 +1,9 @@
 FROM ubuntu:latest as lss
 
+ENV LSS_ACCESS_KEY="lssaccess"
+
+ENV LSS_PASSWORD_KEY="lsspassword"
+
 RUN apt-get update
 
 RUN apt-get install -y python3 python3-pip

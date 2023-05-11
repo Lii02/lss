@@ -8,6 +8,7 @@ CORS(app)
 api = Api(app)
 
 api.add_resource(Refresh, "/refresh")
+api.add_resource(Authenticate, "/authenticate")
 api.add_resource(CreateBucket, "/create_bucket")
 api.add_resource(RemoveBucket, "/remove_bucket")
 api.add_resource(UploadFile, "/upload")
