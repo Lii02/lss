@@ -2,6 +2,7 @@ from flask import *
 from flask_restful import *
 from bucket_manager import *
 import base64
+import io
 
 manager = BucketManager("./")
 manager.load_state()
@@ -34,14 +35,12 @@ class RemoveBucket(Resource):
 
 class UploadFile(Resource):
     def post(self):
-        data = request.get_json()
+        file = request.files["file"]
+        data = json.loads(request.form["json"])
         # TODO: Add the option to encode the data when sending to the bucket folder
         is_encoded = bool(int(data["is_encoded"]))
-        blob = data["blob"].encode("utf-8")
-        if is_encoded:
-            input_data = base64.b64decode(blob)
-        else:
-            input_data = blob
+        blob = file.read()
+        input_data = base64.b64decode(blob) if is_encoded else blob
         code = manager.buckets[data["bucket_name"]].upload(data["filename"], input_data)
         if code:
             manager.save_state()
@@ -52,12 +51,9 @@ class UploadFile(Resource):
 class DownloadFile(Resource):
     def get(self):
         data = request.get_json()
-        blob = manager.buckets[data["bucket_name"]].download(data["filename"])
-        encoded_blob = base64.b64decode(blob)
+        bucket = manager.buckets[data["bucket_name"]]
+        blob = bucket.download(data["filename"])
         if blob is not None:
-            return {
-                "data": f"{encoded_blob}",
-                "is_encoded": "1"
-            }
+            return send_file(io.BytesIO(blob), download_name=data["filename"], as_attachment=True, mimetype="text/plain")
         else:
             return "File doesn't exist in bucket", 409
