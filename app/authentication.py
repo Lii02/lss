@@ -12,7 +12,7 @@ class AuthenticationManager:
         self.allowed.clear()
 
     def auth(self, access_key: str, password_key: str, ip_address: str):
-        if self.access_key == access_key and self.password_key == password_key:
+        if self.access_key == access_key and self.password_key == password_key and not self.is_authed(ip_address):
             self.allowed.append(ip_address)
             print(f"Successfully authed {ip_address}")
             return True
@@ -21,6 +21,7 @@ class AuthenticationManager:
     def deauth(self, ip_address: str):
         if ip_address in self.allowed:
             self.allowed.remove(ip_address)
+		print(f"Successfully deauthed {ip_address}")
             return True
         return False
 
