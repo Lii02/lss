@@ -4,8 +4,8 @@ import io
 class Bucket:
     def __init__(self, bucket_name: str):
         self.bucket_name = bucket_name
-        self.files = []
         self.whole_path = ""
+        self.files = []
 
     def load(self):
         self.files = os.listdir(self.whole_path)
@@ -32,12 +32,14 @@ class Bucket:
         else:
             return None
 
-    def to_dict(self):
-        return {
-            "bucket_name": self.bucket_name,
-            "whole_path": self.whole_path,
-            "files": self.files
-        }
+    def remove(self, filename: str):
+        if filename in self.files:
+            os.remove("/".join([self.whole_path, filename]))
+            self.files.remove(filename)
+            print(f"Removed file {filename} from {self.bucket_name}")
+            return True
+        else:
+            return False
 
     def __str__(self):
         return f"{self.bucket_name} {self.whole_path} {self.files}"

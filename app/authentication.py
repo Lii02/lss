@@ -21,7 +21,7 @@ class AuthenticationManager:
     def deauth(self, ip_address: str):
         if ip_address in self.allowed:
             self.allowed.remove(ip_address)
-		print(f"Successfully deauthed {ip_address}")
+            print(f"Successfully deauthed {ip_address}")
             return True
         return False
 

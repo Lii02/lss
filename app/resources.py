@@ -45,7 +45,7 @@ class CreateBucket(Resource):
         data = request.get_json()
         bucket = Bucket(data["bucket_name"])
         code = manager.add_bucket(bucket)
-        if code is True:
+        if code:
             manager.save_state()
             return "Success", 200
         else:
@@ -56,7 +56,7 @@ class RemoveBucket(Resource):
     def post(self):
         data = request.get_json()
         code = manager.remove_bucket(data["bucket_name"])
-        if code is True:
+        if code:
             manager.save_state()
             return "Success", 200
         else:
@@ -91,5 +91,18 @@ class DownloadFile(Resource):
         blob = bucket.download(data["filename"])
         if blob is not None:
             return send_file(io.BytesIO(blob), download_name=data["filename"], as_attachment=True, mimetype="text/plain")
+        else:
+            return "File doesn't exist in bucket", 409
+
+class RemoveFile(Resource):
+    @auth.authenticated_resource
+    def post(self):
+        data = request.get_json()
+        if data["bucket_name"] not in manager.buckets:
+            return "Bucket doesn't exist", 409
+        bucket = manager.buckets[data["bucket_name"]]
+        code = bucket.remove(data["filename"])
+        if code:
+            pass
         else:
             return "File doesn't exist in bucket", 409
